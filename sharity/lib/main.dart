@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:Sharity/nestedTabBarView.dart';
 import 'package:flutter/material.dart';
 import 'package:english_words/english_words.dart';
 
@@ -72,9 +73,7 @@ class _SharityHomePageState extends State<SharityHomePage>
       ),
       body: TabBarView(
         children: <Widget>[
-          Center(
-            child: Text("Home"),
-          ),
+          NestedTabBar(),
           Center(
             child: Text("Email"),
           ),
