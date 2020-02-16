@@ -35,11 +35,23 @@ class _NestedTabBarState extends State<NestedTabBar>
           unselectedLabelColor: Colors.black54,
           isScrollable: true,
           tabs: <Widget>[
-            Tab(
-              text: "One",
+            Container(
+              width: 150,
+              child: Tab(
+                child: Text(
+                  'Hello',
+                  style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
+                ),
+              )
             ),
-            Tab(
-              text: "Two",
+            Container(
+                width: 150,
+                child: Tab(
+                  child: Text(
+                    'Hello2',
+                    style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
+                  ),
+                )
             ),
           ],
         ),
