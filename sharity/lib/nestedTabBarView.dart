@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
 
 
 class NestedTabBar extends StatefulWidget {
@@ -11,14 +10,18 @@ class NestedTabBar extends StatefulWidget {
   _NestedTabBarState createState() => _NestedTabBarState();
 }
 
-class _NestedTabBarState extends State<NestedTabBar>
-  with TickerProviderStateMixin {
+class _NestedTabBarState extends State<NestedTabBar> with TickerProviderStateMixin {
   TabController _nestedTabController;
+  Future<Food> futureFood;
 
   @override
   void initState() {
+    print("Calling super");
+    super.initState();
+    print("Called Super");
     _nestedTabController = new TabController(length: 2,
         vsync: this);
+    print("Calling Get Food");
   }
 
   @override
@@ -29,6 +32,7 @@ class _NestedTabBarState extends State<NestedTabBar>
 
   @override
   Widget build(BuildContext context) {
+    futureFood = getFood();
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     String url = 'https://api.tomtom.com/map/1/staticimage?layer=basic&style=main&format=png&center=-122.3966%2C%2037.7876&width=300&height=400&view=Unified&zoom=12&key=yirJiURqW2kiZQ1hNQJ1UIcS2IC7MfPm';
@@ -81,7 +85,25 @@ class _NestedTabBarState extends State<NestedTabBar>
                 ),
               ),
               Container(
-                child: FoodList(),
+                child: FutureBuilder<Food>(
+                  future: futureFood,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return Text(
+                          "Restaurant: " + snapshot.data.restaurant + "\n" + "Food Item: " + snapshot.data.item_name + " Price: " + snapshot.data.price,
+                          style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
+                      );
+                      //print("Has data");
+                      //print(snapshot.data);
+                      //print(snapshot.data.item_name);
+                      //print(snapshot.data.restaurant);
+                      //return Text();
+                    } else if (snapshot.hasError) {
+                      return Text("ERROR WITH DATA");
+                    }
+                    return CircularProgressIndicator();
+                  }
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
                   color: Colors.orangeAccent,
@@ -106,7 +128,6 @@ class FoodState extends State<FoodList> {
   }
 
   Widget _buildSuggestions() {
-    Food f1 = Food("Rallys", "Burger", "1", "2.50");
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
       itemBuilder: /*1*/ (context, i) {
@@ -114,10 +135,7 @@ class FoodState extends State<FoodList> {
 
       final index = i ~/ 2; /*3*/
       if (index >= _suggestions.length) {
-        Future<String> the_data = getFood();
-        the_data.then(())
-
-        _suggestions.addAll(["hello"]); /*4*/
+        _suggestions.addAll(["hello", "world"]); /*4*/
       }
       return _buildRow(_suggestions[index]);
       });
@@ -139,32 +157,46 @@ class FoodList extends StatefulWidget {
     FoodState createState() => FoodState();
 }
 
-class Food {
-  String restaurant;
-  String name;
-  String id;
-  String price;
 
-  Food(this.restaurant, this.name, this.id, this.price);
+class Product {
+  final List<Food> foods;
+
+  Product({this.foods});
 }
 
+Future<Food> getFood() async {
+  //final response = await http.get('http://www.google.com');
+  final response = await http.get('http://f5a3f93a.ngrok.io/get_all_food/');
 
-Future<String> getFood() async {
-  String the_data = "";
-  String url = "http://03a1bde2.ngrok.io/get_all_food/";
-  Uri apiUrl = Uri.parse(url);
+  print("response: " + response.body);
 
-  HttpClientRequest request = await new HttpClient().getUrl(apiUrl);
-  HttpClientResponse response = await request.close();
-
-  Stream resStream = response.transform(Utf8Decoder());
-
-  await for (var data in resStream) {
-    the_data = data;
+  if (response.statusCode == 200) {
+    return Food.fromJson(json.decode(response.body));
+  } else {
+    throw Exception('Failed to load food!!!');
   }
 
-  return the_data.then(d){
-    print(d);
-  };
 }
 
+
+class Food {
+  final int inventory_id;
+  final String restaurant;
+  final String item_name;
+  final String price;
+  final int quantity;
+
+  Food({this.inventory_id, this.restaurant, this.item_name, this.price, this.quantity});
+
+  factory Food.fromJson(Map<String, dynamic> json) {
+
+    return Food(
+      inventory_id: json['inventory_id'],
+      restaurant: json['restaurant'],
+      item_name: json['item_name'],
+      price: json['price'],
+      quantity: json['quantity'],
+    );
+
+  }
+}
