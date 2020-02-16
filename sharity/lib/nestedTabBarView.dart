@@ -25,6 +25,8 @@ class _NestedTabBarState extends State<NestedTabBar>
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+    String url = 'https://api.tomtom.com/map/1/staticimage?layer=basic&style=main&format=png&center=-122.3966%2C%2037.7876&width=300&height=400&view=Unified&zoom=12&key=yirJiURqW2kiZQ1hNQJ1UIcS2IC7MfPm';
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -36,19 +38,19 @@ class _NestedTabBarState extends State<NestedTabBar>
           isScrollable: true,
           tabs: <Widget>[
             Container(
-              width: 150,
+              width: screenWidth * .30,
               child: Tab(
                 child: Text(
-                  'Hello',
+                  'Map',
                   style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
                 ),
               )
             ),
             Container(
-                width: 150,
+                width: screenWidth * .30,
                 child: Tab(
                   child: Text(
-                    'Hello2',
+                    'Food List',
                     style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 2.0),
                   ),
                 )
@@ -61,10 +63,16 @@ class _NestedTabBarState extends State<NestedTabBar>
           child: TabBarView(
             controller: _nestedTabController,
             children: <Widget>[
+              //Image.network(
+              //  'https://api.tomtom.com/map/1/staticimage?layer=basic&style=main&format=png&center=-122.3966%2C%2037.7876&width=256&height=256&view=Unified&zoom=12&key=yirJiURqW2kiZQ1hNQJ1UIcS2IC7MfPm',
+              //),
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
                   color: Colors.blueAccent,
+                ),
+                child: Image.network(
+                  url,
                 ),
               ),
               Container(
