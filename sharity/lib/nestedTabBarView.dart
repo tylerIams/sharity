@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:english_words/english_words.dart';
+
 
 
 class NestedTabBar extends StatefulWidget {
@@ -76,6 +78,7 @@ class _NestedTabBarState extends State<NestedTabBar>
                 ),
               ),
               Container(
+                child: FoodList(),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8.0),
                   color: Colors.orangeAccent,
@@ -87,6 +90,44 @@ class _NestedTabBarState extends State<NestedTabBar>
       ],
     );
   }
-
-
 }
+
+class FoodState extends State<FoodList> {
+  final _suggestions = <String>[];
+  final _biggerFont = const TextStyle(fontSize: 18.0);
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _buildSuggestions(),
+    );
+  }
+
+  Widget _buildSuggestions() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16.0),
+      itemBuilder: /*1*/ (context, i) {
+      if (i.isOdd) return Divider(); /*2*/
+
+      final index = i ~/ 2; /*3*/
+      if (index >= _suggestions.length) {
+        _suggestions.addAll(["Hello", "World", "Fuck"]); /*4*/
+      }
+      return _buildRow(_suggestions[index]);
+      });
+  }
+  Widget _buildRow(String pair) {
+    return ListTile(
+      title: Text(
+        pair,
+        style: _biggerFont,
+        ),
+      );
+    }
+  }
+
+
+class FoodList extends StatefulWidget {
+  @override
+    FoodState createState() => FoodState();
+}
+
