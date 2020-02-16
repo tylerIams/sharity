@@ -1,5 +1,8 @@
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
 
 
 
@@ -103,6 +106,7 @@ class FoodState extends State<FoodList> {
   }
 
   Widget _buildSuggestions() {
+    Food f1 = Food("Rallys", "Burger", "1", "2.50");
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
       itemBuilder: /*1*/ (context, i) {
@@ -110,7 +114,10 @@ class FoodState extends State<FoodList> {
 
       final index = i ~/ 2; /*3*/
       if (index >= _suggestions.length) {
-        _suggestions.addAll(["Hello", "World", "Fuck"]); /*4*/
+        Future<String> the_data = getFood();
+        the_data.then(())
+
+        _suggestions.addAll(["hello"]); /*4*/
       }
       return _buildRow(_suggestions[index]);
       });
@@ -118,6 +125,7 @@ class FoodState extends State<FoodList> {
   Widget _buildRow(String pair) {
     return ListTile(
       title: Text(
+        //pair.restaurant + " " + pair.name + " " + pair.price,
         pair,
         style: _biggerFont,
         ),
@@ -129,5 +137,34 @@ class FoodState extends State<FoodList> {
 class FoodList extends StatefulWidget {
   @override
     FoodState createState() => FoodState();
+}
+
+class Food {
+  String restaurant;
+  String name;
+  String id;
+  String price;
+
+  Food(this.restaurant, this.name, this.id, this.price);
+}
+
+
+Future<String> getFood() async {
+  String the_data = "";
+  String url = "http://03a1bde2.ngrok.io/get_all_food/";
+  Uri apiUrl = Uri.parse(url);
+
+  HttpClientRequest request = await new HttpClient().getUrl(apiUrl);
+  HttpClientResponse response = await request.close();
+
+  Stream resStream = response.transform(Utf8Decoder());
+
+  await for (var data in resStream) {
+    the_data = data;
+  }
+
+  return the_data.then(d){
+    print(d);
+  };
 }
 
